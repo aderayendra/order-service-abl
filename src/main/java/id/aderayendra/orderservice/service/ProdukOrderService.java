@@ -33,6 +33,12 @@ public class ProdukOrderService {
         return repository.findById(id).map(this::mapToResponse);
     }
 
+    public List<ProdukOrderResponse> getOrdersByProductId(Integer productId) {
+        return repository.findByProdukId(productId).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public ProdukOrder createOrder(ProdukOrder order) {
         return repository.save(order);
     }

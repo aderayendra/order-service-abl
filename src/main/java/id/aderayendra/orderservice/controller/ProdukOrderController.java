@@ -28,6 +28,11 @@ public class ProdukOrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @GetMapping("/product/{productId}")
+    public List<ProdukOrderResponse> getOrdersByProductId(@PathVariable Integer productId) {
+        return service.getOrdersByProductId(productId);
+    }
+
     @PostMapping
     public ProdukOrder createOrder(@RequestBody ProdukOrder order) {
         return service.createOrder(order);
