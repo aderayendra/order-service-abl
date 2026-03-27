@@ -25,17 +25,23 @@ public class ProdukOrderService {
 
     public List<ProdukOrderResponse> getAllOrders() {
         return repository.findAll().stream()
-                .map(this::mapToResponse)
+                .map(order -> mapToResponse(order, false))
                 .collect(Collectors.toList());
     }
 
     public Optional<ProdukOrderResponse> getOrderById(Integer id) {
-        return repository.findById(id).map(this::mapToResponse);
+        return repository.findById(id).map(order -> mapToResponse(order, false));
     }
 
     public List<ProdukOrderResponse> getOrdersByProductId(Integer productId) {
         return repository.findByProdukId(productId).stream()
-                .map(this::mapToResponse)
+                .map(order -> mapToResponse(order, false))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProdukOrderResponse> getOrdersByProductIdWithProduct(Integer productId) {
+        return repository.findByProdukId(productId).stream()
+                .map(order -> mapToResponse(order, true))
                 .collect(Collectors.toList());
     }
 
@@ -59,13 +65,15 @@ public class ProdukOrderService {
         repository.deleteById(id);
     }
 
-    private ProdukOrderResponse mapToResponse(ProdukOrder order) {
+    private ProdukOrderResponse mapToResponse(ProdukOrder order, boolean includeProduct) {
         ProdukDTO produk = null;
-        try {
-            produk = restTemplate.getForObject(productServiceUrl + "/" + order.getProdukId(), ProdukDTO.class);
-        } catch (Exception e) {
-            // Log error or handle cases where product service is down
-            System.err.println("Failed to fetch product details for ID: " + order.getProdukId() + ". Error: " + e.getMessage());
+        if (includeProduct) {
+            try {
+                produk = restTemplate.getForObject(productServiceUrl + "/" + order.getProdukId(), ProdukDTO.class);
+            } catch (Exception e) {
+                // Log error or handle cases where product service is down
+                System.err.println("Failed to fetch product details for ID: " + order.getProdukId() + ". Error: " + e.getMessage());
+            }
         }
 
         return ProdukOrderResponse.builder()

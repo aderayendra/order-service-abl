@@ -33,6 +33,11 @@ public class ProdukOrderController {
         return service.getOrdersByProductId(productId);
     }
 
+    @GetMapping("/product/{productId}/with-product")
+    public List<ProdukOrderResponse> getOrdersByProductIdWithProduct(@PathVariable Integer productId) {
+        return service.getOrdersByProductIdWithProduct(productId);
+    }
+
     @PostMapping
     public ProdukOrder createOrder(@RequestBody ProdukOrder order) {
         return service.createOrder(order);
