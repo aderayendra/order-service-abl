@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/orders")
+@RequestMapping("/api/order")
 @RequiredArgsConstructor
 public class ProdukOrderController {
 
@@ -28,14 +28,18 @@ public class ProdukOrderController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/product/{productId}")
+    @GetMapping("/produk/{productId}")
     public List<ProdukOrderResponse> getOrdersByProductId(@PathVariable String productId) {
         return service.getOrdersByProductId(productId);
     }
 
     @PostMapping
-    public ProdukOrder createOrder(@RequestBody ProdukOrder order) {
-        return service.createOrder(order);
+    public ResponseEntity<ProdukOrder> createOrder(@RequestBody ProdukOrder order) {
+        try {
+            return ResponseEntity.ok(service.createOrder(order));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PutMapping("/{id}")

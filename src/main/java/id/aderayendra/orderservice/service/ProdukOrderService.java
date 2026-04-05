@@ -40,6 +40,7 @@ public class ProdukOrderService {
     }
 
     public ProdukOrder createOrder(ProdukOrder order) {
+        validateProductExists(order.getProdukId());
         return repository.save(order);
     }
 
@@ -47,12 +48,22 @@ public class ProdukOrderService {
         ProdukOrder order = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Order not found with id: " + id));
 
+        validateProductExists(orderDetails.getProdukId());
+
         order.setProdukId(orderDetails.getProdukId());
         order.setJumlah(orderDetails.getJumlah());
         order.setTanggal(orderDetails.getTanggal());
         order.setTotal(orderDetails.getTotal());
 
         return repository.save(order);
+    }
+
+    private void validateProductExists(String productId) {
+        try {
+            restTemplate.getForObject(productServiceUrl + "/" + productId, Object.class);
+        } catch (Exception e) {
+            throw new RuntimeException("Product not found with id: " + productId);
+        }
     }
 
     public void deleteOrder(Integer id) {
