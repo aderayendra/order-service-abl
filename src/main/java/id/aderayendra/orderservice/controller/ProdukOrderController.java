@@ -29,13 +29,8 @@ public class ProdukOrderController {
     }
 
     @GetMapping("/product/{productId}")
-    public List<ProdukOrderResponse> getOrdersByProductId(@PathVariable Integer productId) {
+    public List<ProdukOrderResponse> getOrdersByProductId(@PathVariable String productId) {
         return service.getOrdersByProductId(productId);
-    }
-
-    @GetMapping("/product/{productId}/with-product")
-    public List<ProdukOrderResponse> getOrdersByProductIdWithProduct(@PathVariable Integer productId) {
-        return service.getOrdersByProductIdWithProduct(productId);
     }
 
     @PostMapping

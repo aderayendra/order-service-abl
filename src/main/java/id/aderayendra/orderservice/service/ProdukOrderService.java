@@ -25,23 +25,17 @@ public class ProdukOrderService {
 
     public List<ProdukOrderResponse> getAllOrders() {
         return repository.findAll().stream()
-                .map(order -> mapToResponse(order, false))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     public Optional<ProdukOrderResponse> getOrderById(Integer id) {
-        return repository.findById(id).map(order -> mapToResponse(order, false));
+        return repository.findById(id).map(this::mapToResponse);
     }
 
-    public List<ProdukOrderResponse> getOrdersByProductId(Integer productId) {
+    public List<ProdukOrderResponse> getOrdersByProductId(String productId) {
         return repository.findByProdukId(productId).stream()
-                .map(order -> mapToResponse(order, false))
-                .collect(Collectors.toList());
-    }
-
-    public List<ProdukOrderResponse> getOrdersByProductIdWithProduct(Integer productId) {
-        return repository.findByProdukId(productId).stream()
-                .map(order -> mapToResponse(order, true))
+                .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
@@ -65,15 +59,13 @@ public class ProdukOrderService {
         repository.deleteById(id);
     }
 
-    private ProdukOrderResponse mapToResponse(ProdukOrder order, boolean includeProduct) {
+    private ProdukOrderResponse mapToResponse(ProdukOrder order) {
         ProdukDTO produk = null;
-        if (includeProduct) {
-            try {
-                produk = restTemplate.getForObject(productServiceUrl + "/" + order.getProdukId(), ProdukDTO.class);
-            } catch (Exception e) {
-                // Log error or handle cases where product service is down
-                System.err.println("Failed to fetch product details for ID: " + order.getProdukId() + ". Error: " + e.getMessage());
-            }
+        try {
+            produk = restTemplate.getForObject(productServiceUrl + "/" + order.getProdukId(), ProdukDTO.class);
+        } catch (Exception e) {
+            // Log error or handle cases where product service is down
+            System.err.println("Failed to fetch product details for ID: " + order.getProdukId() + ". Error: " + e.getMessage());
         }
 
         return ProdukOrderResponse.builder()
