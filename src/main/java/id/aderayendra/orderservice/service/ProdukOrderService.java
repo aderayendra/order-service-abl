@@ -1,10 +1,12 @@
 package id.aderayendra.orderservice.service;
 
 import id.aderayendra.orderservice.dto.ProdukDTO;
+import id.aderayendra.orderservice.dto.ProdukOrderMessage;
 import id.aderayendra.orderservice.dto.ProdukOrderResponse;
 import id.aderayendra.orderservice.model.ProdukOrder;
 import id.aderayendra.orderservice.repository.ProdukOrderRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +21,7 @@ public class ProdukOrderService {
 
     private final ProdukOrderRepository repository;
     private final RestTemplate restTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Value("${product-service.url}")
     private String productServiceUrl;
@@ -41,7 +44,9 @@ public class ProdukOrderService {
 
     public ProdukOrder createOrder(ProdukOrder order) {
         validateProductExists(order.getProdukId());
-        return repository.save(order);
+        ProdukOrder savedOrder = repository.save(order);
+        sendOrderMessage(savedOrder, "CREATED");
+        return savedOrder;
     }
 
     public ProdukOrder updateOrder(Integer id, ProdukOrder orderDetails) {
@@ -55,7 +60,25 @@ public class ProdukOrderService {
         order.setTanggal(orderDetails.getTanggal());
         order.setTotal(orderDetails.getTotal());
 
-        return repository.save(order);
+        ProdukOrder updatedOrder = repository.save(order);
+        sendOrderMessage(updatedOrder, "UPDATED");
+        return updatedOrder;
+    }
+
+    private void sendOrderMessage(ProdukOrder order, String status) {
+        ProdukDTO product = null;
+        try {
+            product = restTemplate.getForObject(productServiceUrl + "/" + order.getProdukId(), ProdukDTO.class);
+        } catch (Exception e) {
+            System.err.println("Failed to fetch product details for messaging. ID: " + order.getProdukId() + ". Error: " + e.getMessage());
+        }
+
+        ProdukOrderMessage message = ProdukOrderMessage.builder()
+                .order(order)
+                .status(status)
+                .product(product)
+                .build();
+        rabbitTemplate.convertAndSend("order-queue", message);
     }
 
     private void validateProductExists(String productId) {
