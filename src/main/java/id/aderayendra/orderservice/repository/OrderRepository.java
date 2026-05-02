@@ -1,12 +1,12 @@
 package id.aderayendra.orderservice.repository;
 
-import id.aderayendra.orderservice.model.ProdukOrder;
+import id.aderayendra.orderservice.model.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface ProdukOrderRepository extends JpaRepository<ProdukOrder, Integer> {
-    List<ProdukOrder> findByProdukId(String produkId);
+public interface OrderRepository extends JpaRepository<Order, Integer> {
+    List<Order> findByProdukId(String produkId);
 }

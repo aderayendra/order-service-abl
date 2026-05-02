@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProdukOrder {
+public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +29,7 @@ public class ProdukOrder {
 
     @Column(nullable = false)
     private Double total;
+
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 }

@@ -11,11 +11,12 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProdukOrderResponse {
+public class OrderResponse {
     private Integer id;
     private String produkId;
     private Integer jumlah;
     private LocalDate tanggal;
     private Double total;
+    private Long userId;
     private ProdukDTO produk;
 }
