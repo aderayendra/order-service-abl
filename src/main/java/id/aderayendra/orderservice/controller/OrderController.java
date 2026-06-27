@@ -27,6 +27,13 @@ public class OrderController {
         return service.getAllOrders();
     }
 
+    @GetMapping("/my-orders")
+    @PreAuthorize("hasAuthority('USER')")
+    public List<OrderResponse> getMyOrders(@AuthenticationPrincipal String username) {
+        Long userId = (Long) Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getCredentials();
+        return service.getOrdersByUserId(userId);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'USER')")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Integer id) {

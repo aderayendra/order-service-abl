@@ -35,6 +35,12 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<OrderResponse> getOrdersByUserId(Long userId) {
+        return repository.findByUserId(userId).stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     public Optional<OrderResponse> getOrderById(Integer id) {
         return repository.findById(id).map(this::mapToResponse);
     }
